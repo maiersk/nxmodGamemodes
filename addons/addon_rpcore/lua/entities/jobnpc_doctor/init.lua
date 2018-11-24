@@ -1,6 +1,25 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
+--模块化读取table--------------------------------------------------------------------------
+items = items or {}
 
+items.doctorTable = {}
+
+function items.AdddoctorTable(data)
+	data.value = data.value or {}
+	items.doctorTable[data.name] = data
+end
+
+function items.RemovedoctorTable(name)
+	items.doctorTable[name] = nil
+end
+
+for k, name in pairs(file.Find("lua/entities/jobnpc_doctor/items/*.lua", "GAME")) do
+	local path = "entities/jobnpc_doctor/items/" .. name
+	include(path)
+	AddCSLuaFile(path)
+end
+-------------------------------------------------------------------------------------------
 include('shared.lua')
 
 function ENT:Initialize()
@@ -39,3 +58,21 @@ function ENT:AcceptInput( name, activator, caller )
 
   end
 end
+
+concommand.Add("doctor_tool", function(ply, command, arguments)
+	if !arguments then return end
+    data = data or {}
+    local type = table.concat(arguments, " ")
+	local data = items.projectTable[type]
+	if !data then return end
+    PrintTable(data)
+    print("is ok !!!")
+	if data.level then
+		if (tonumber(ply:GetNWInt("level" .. "_" .. ply:GetUserGroup())) < data.level) then return end
+		if !data.class then return end
+		
+		ply:Give(data.class) 
+
+	end
+
+end)

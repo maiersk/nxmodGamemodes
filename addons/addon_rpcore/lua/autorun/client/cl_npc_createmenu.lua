@@ -46,7 +46,7 @@ end)
 usermessage.Hook("jobnpc_srcmenu", function()
 	local menu = vgui.Create("jobnpc_scrmenu")
 	menu:jobnpc_button(
-		"citizen",
+		"citizen",				--将成为的职业ID
 		{
 								--看这是这一行最长的字符了,请注意.
 			--就职--按钮npc对话词             
@@ -72,11 +72,11 @@ usermessage.Hook("jobnpc_srcmenu", function()
 			text21 = "    先去辞职再过来干吧!",
 
 		},
-		items.citizenTable,
-		"user",
-		"reuser",
-		0,
-		0
+		items.citizenTable,		--职业专属工具的数据表
+		"user",					--检查是否user用户/检查按钮是否user用户而显示
+		"reuser",				--辞职方法
+		0,						--就职费用
+		0						--辞职费用
 	)
 	menu:jobnpc_base(citizenNPCConfig.NpcModel, "公民", ULib.ucl.groups["citizen"].team.wage, ULib.ucl.groups["citizen"].team.description)
 	
@@ -349,8 +349,8 @@ function PANEL:jobnpc_button(TeamID, textarr, toolTable, checkjob, reuser, mcost
 		selectbutton4.DoClick = function ( len, pl )
 			print( "2")
 			--net.Start( "Buttonflow" )
-			local newfrom = vgui.Create("citizen_arm")
-			newfrom:Center()
+			--local newfrom = vgui.Create("citizen_arm")
+			--newfrom:Center()
 			--net.SendToServer()
 
 		end

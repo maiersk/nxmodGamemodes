@@ -1,4 +1,3 @@
-include('shared.lua')
 --模块化读取table--------------------------------------------------------------------------
 items = items or {}
 
@@ -13,10 +12,12 @@ function items.RemoveprojectTable(name)
 	items.projectTable[name] = nil
 end
 
-for k, name in pairs(file.Find("lua/entities/jobnpc_project/items/*.lua", "LUA")) do
+for k, name in pairs(file.Find("entities/jobnpc_project/items/*.lua", "LUA")) do
 	include("entities/jobnpc_project/items/" .. name)
 end
 -------------------------------------------------------------------------------------------
+include('shared.lua')
+
 surface.CreateFont( "trebuchet50", {
     font = "Trebuchet MS", 
     size = ScreenScale(30),
@@ -89,7 +90,7 @@ net.Receive( "project_NPCPANEL", function()		--需每个npc不一样网络信息
 		ULib.ucl.groups["project"].team.lcost
 	)
 	menu:jobnpc_base(projectNPCConfig.NpcModel, "工程", ULib.ucl.groups["project"].team.wage, ULib.ucl.groups["project"].team.description)
-
+	
 	--[[
 	if( !NPCMianPANEL ) then
 		NPCMianPANEL = vgui.Create( "project_menu_npc" )		--需每个npc不一样的界面名字

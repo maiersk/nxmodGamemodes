@@ -1,4 +1,23 @@
+--模块化读取table--------------------------------------------------------------------------
+items = items or {}
+
+items.doctorTable = {}
+
+function items.AdddoctorTable(data)
+	data.value = data.value or {}
+	items.doctorTable[data.name] = data
+end
+
+function items.RemovedoctorTable(name)
+	items.doctorTable[name] = nil
+end
+
+for k, name in pairs(file.Find("entities/jobnpc_doctor/items/*.lua", "LUA")) do
+	include("entities/jobnpc_doctor/items/" .. name)
+end
+-------------------------------------------------------------------------------------------
 include('shared.lua')
+
 surface.CreateFont( "trebuchet50", {
     font = "Trebuchet MS", 
     size = ScreenScale(30),
@@ -33,9 +52,47 @@ surface.CreateFont( "my_npc", {
 	weight = 1000
 } )
 
+PrintTable(items.doctorTable)
 --收到信息后启用function
-net.Receive( "doctor_NPCPANEL", function()		--需每个npc不一样的网络信息名字
+net.Receive( "doctor_NPCPANEL", function()		--需每个npc不一样网络信息的名字
 	--如果不存在，创建窗口设置不可见
+	local menu = vgui.Create("jobnpc_scrmenu")
+	menu:jobnpc_button(
+		"doctor",
+		{
+								--看这是这一行最长的字符了,请注意.
+			--就职--按钮npc对话词             
+			text1 = "未命名：",
+			text2 = "     你确定要这份工作了吗",
+			text3 = "     不要嫌弃喔.",
+			--聊聊天--按钮npc对话词
+			buttontext1         = "聊聊天",
+			text5 = "     文明游戏,愉快游玩",
+			text6 = "     注意自己的游戏行为,和谐游玩",
+			--其他--按钮npc对话词
+			buttontext3         = "任务",
+			text8 = "     你浪费了我npc的生命!",
+			text9 = "     其他",
+			--辞职--按钮npc对话词
+			text14 = "    你辞掉的话会成为游客!",
+			text15 = "    很多东西都会玩不成的.",
+			--默认npc对话词
+			text17 = "    一天又一天没厌倦吧?",
+			text18 = "    食材不够就通知加哦.",
+
+			text20 = "    你已经有别的职业了",
+			text21 = "    先去辞职再过来干吧!",
+
+		},
+		items.doctorTable,
+		"citizen",
+		"rejob",
+		ULib.ucl.groups["doctor"].team.mcost,
+		ULib.ucl.groups["doctor"].team.lcost
+	)
+	menu:jobnpc_base(doctorNPCConfig.NpcModel, "工程", ULib.ucl.groups["doctor"].team.wage, ULib.ucl.groups["doctor"].team.description)
+	
+	--[[
 	if( !NPCMianPANEL ) then
 		NPCMianPANEL = vgui.Create( "doctor_menu_npc" )		--需每个npc不一样的界面名字
 		NPCMianPANEL:SetVisible( false )
@@ -50,7 +107,8 @@ net.Receive( "doctor_NPCPANEL", function()		--需每个npc不一样的网络信�
 		--否则设置可见，设置能鼠标触控
 		NPCMianPANEL = vgui.Create( "doctor_menu_npc" )		--需每个npc不一样的界面名字
 		gui.EnableScreenClicker( true )
-	end  
+	end 
+	--]] 
 end )
 
 --自定义面板

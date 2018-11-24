@@ -23,6 +23,7 @@ function ply:StatsSave()
 end
 
 --新建一个玩家配置加载/初始化function
+--加載玩家每中职业的经验等级
 function ply:StatsLoad()
     local tbl = {
         "citizen",
