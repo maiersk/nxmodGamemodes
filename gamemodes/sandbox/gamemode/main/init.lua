@@ -1,6 +1,6 @@
 AddCSLuaFile( "cl_hud.lua" )
 AddCSLuaFile( "shared.lua" )
-AddCSLuaFile( "sv_job.lua" )
+AddCSLuaFile( "sv_job.lua" )    --
 AddCSLuaFile( "cl_init.lua" )
 --AddCSLuaFile( "teamconfig.lua" )
 AddCSLuaFile( "vgui/menu_main.lua" )
@@ -26,7 +26,7 @@ util.AddNetworkString("f4menu")
 hook.Add( "PlayerInitialSpawn", "PlayerfirstSpawn", function( ply )
     
     --===设置
-    ply:StatsLoad()
+    ply:StatsLoad()     --加载玩家性别, 经验, 等级信息
     --发送给cl_init.lua作为第一次进服后客户端执行function的事件
     if ( ply:GetNWString( "Gender" ) == "wait" ) then   --如果性别是待确定状态
         net.Start( "firstspawn" )
