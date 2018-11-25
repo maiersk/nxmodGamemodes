@@ -1,6 +1,25 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
+--模块化读取table--------------------------------------------------------------------------
+items = items or {}
 
+items.poilceTable = {}
+
+function items.AddpoilceTable(data)
+	data.value = data.value or {}
+	items.poilceTable[data.name] = data
+end
+
+function items.RemovepoilceTable(name)
+	items.poilceTable[name] = nil
+end
+
+for k, name in pairs(file.Find("lua/entities/jobnpc_poilce/items/*.lua", "GAME")) do
+	local path = "entities/jobnpc_poilce/items/" .. name
+	include(path)
+	AddCSLuaFile(path)
+end
+-------------------------------------------------------------------------------------------
 include('shared.lua')
 
 function ENT:Initialize()
