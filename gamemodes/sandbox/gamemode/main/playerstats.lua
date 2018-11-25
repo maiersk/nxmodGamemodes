@@ -18,7 +18,7 @@ function ply:StatsSave()
     end
 
     self:SetPData( "Gender", self:GetNWString( "Gender") )  --设置PData的性别保存进数据库，值是网络整数
-    print( "saveGender:" .. self:GetNWString( "Gender" ) )
+    print( "save Gender:" .. self:GetNWString( "Gender" ) )
 
 end
 
@@ -71,23 +71,23 @@ end
 --增加经验function
 function ply:StatsAddXp( n, jobname )
     self:SetNWInt( "XP" .. "_" .. jobname, self:GetNWInt( "XP" .. "_" .. jobname ) + n )    --网络整数值相加function的n变量
-    if( tonumber( self:GetNWInt( "XP" .. "_" .. jobname ) ) > 99 && tonumber( self:GetNWInt( "Level" .. "_" .. jobname ) ) < 5 ) then  --如果经验大于99和等级小于10，那么
+    if( tonumber( self:GetNWInt( "XP" .. "_" .. jobname ) ) > 99 && tonumber( self:GetNWInt( "Level" .. "_" .. jobname ) ) < 5 ) then  --如果经验大于99和等级小于5，那么
         local tempxp = self:GetNWInt( "XP" .. "_" .. jobname ) - 100      --缓存经验变量等于，当前xp变量减100
-        self:StatsLevelup( jobname )                             --运行升级function
+        self:StatsLevelup( jobname )                                --运行升级function
         self:SetNWInt( "XP" .. "_" .. jobname, tempxp )                   --设置经验值
         print( "你升级了！！！现在的等级是：" .. self:GetNWInt( "Level" .. "_" .. jobname ) .. "  经验：" .. self:GetNWInt( "XP" .. "_" .. jobname ) )
     elseif( tonumber( self:GetNWInt( "XP" .. "_" .. jobname ) ) > 199 && tonumber( self:GetNWInt( "Level" .. "_" .. jobname ) ) < 10 ) then  --如果经验大于99和等级小于10，那么
-        local tempxp = self:GetNWInt( "XP" .. "_" .. jobname ) - 100      --缓存经验变量等于，当前xp变量减100
+        local tempxp = self:GetNWInt( "XP" .. "_" .. jobname ) - 200      --缓存经验变量等于，当前xp变量减200
         self:StatsLevelup( jobname )                             --运行升级function
         self:SetNWInt( "XP" .. "_" .. jobname, tempxp )                   --设置经验值
         print( "你升级了！！！现在的等级是：" .. self:GetNWInt( "Level" .. "_" .. jobname ) .. "  经验：" .. self:GetNWInt( "XP" .. "_" .. jobname ) )
     elseif( tonumber( self:GetNWInt( "XP" .. "_" .. jobname ) ) > 299 && tonumber( self:GetNWInt( "Level" .. "_" .. jobname ) ) < 15 ) then  --如果经验大于99和等级小于10，那么
-        local tempxp = self:GetNWInt( "XP" .. "_" .. jobname ) - 100      --缓存经验变量等于，当前xp变量减100
+        local tempxp = self:GetNWInt( "XP" .. "_" .. jobname ) - 300      --缓存经验变量等于，当前xp变量减100
         self:StatsLevelup( jobname )                             --运行升级function
         self:SetNWInt( "XP" .. "_" .. jobname, tempxp )                   --设置经验值
         print( "你升级了！！！现在的等级是：" .. self:GetNWInt( "Level" .. "_" .. jobname ) .. "  经验：" .. self:GetNWInt( "XP" .. "_" .. jobname ) )
     elseif( tonumber( self:GetNWInt( "XP" .. "_" .. jobname ) ) > 399 && tonumber( self:GetNWInt( "Level" .. "_" .. jobname ) ) < 20 ) then  --如果经验大于99和等级小于10，那么
-        local tempxp = self:GetNWInt( "XP" .. "_" .. jobname ) - 100      --缓存经验变量等于，当前xp变量减100
+        local tempxp = self:GetNWInt( "XP" .. "_" .. jobname ) - 400      --缓存经验变量等于，当前xp变量减100
         self:StatsLevelup( jobname )                             --运行升级function
         self:SetNWInt( "XP" .. "_" .. jobname, tempxp )                   --设置经验值
         print( "你升级了！！！现在的等级是：" .. self:GetNWInt( "Level" .. "_" .. jobname ) .. "  经验：" .. self:GetNWInt( "XP" .. "_" .. jobname ) )
@@ -96,18 +96,18 @@ function ply:StatsAddXp( n, jobname )
     end
 end
 
---升级function
+--玩家升级
 function ply:StatsLevelup( jobname ) 
-    self:SetPData( "XP" .. "_" .. jobname, 0 )
+    --self:SetPData( "XP" .. "_" .. jobname, 0 )
     self:EmitSound( "garrysmod/sound/common/talk.wav" )
-    self:SetNWInt( "level" .. "_" .. jobname, self:GetNWInt( "Level" .. "_" .. jobname ) + 1 )
+    self:SetNWInt( "Level" .. "_" .. jobname, self:GetNWInt( "Level" .. "_" .. jobname ) + 1 )
 end
 
 function ply:DeXpandLevel( jobname )
-    if (self:GetNWInt("XP" .. "_" .. jobname) > 0 and self:GetNWInt("Level" .. "_" .. jobname) > 0 ) then
+    --if (self:GetNWInt("XP" .. "_" .. jobname) > 0 and self:GetNWInt("Level" .. "_" .. jobname) > 0 ) then --###
         self:SetNWInt("XP" .. "_" .. jobname, 0)
         self:SetNWInt("Level" .. "_" .. jobname, 0)
-    end
+    --end
 end
 
 function ply:SetXPLevel( n, jobname )

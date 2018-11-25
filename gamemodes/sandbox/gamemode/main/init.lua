@@ -58,7 +58,7 @@ end)
 --玩家死后
 hook.Add("PlayerDeath", "playerdeath", function( ply )
     --调试经验增加function
-    ply:StatsAddXp( 55, ply:GetUserGroup() )
+    ply:StatsAddXp( 55, ply:GetUserGroup() )    --###死后加55经验
 
 end)
 
@@ -110,35 +110,37 @@ function GM:PlayerSetHandsModel( ply, ent )
 
 end
 
---xp命令
+--控制台增加xp命令
 concommand.Add("xp_add", function(ply, cmd, arg)
-    if !IsValid(ply) then print("没有玩家") end
+    if !IsValid(ply) then print("没有玩家") return end
     if !arg then return end
     ply:StatsAddXp(tonumber(arg[1]), arg[2])
 
 end)
 
-function SMSChatCommands(ply, text)
+function NXChatCommands(ply, text)
 
     text = string.lower(text) -- 将消息发送为小写，因此命令不区分大小写.
     text = string.Explode(" ", text) -- 将字符串分解为每个空间的表格.
                                      -- 我们这样做，所以我们可以得到论点.
 
-    if (text[1] == "!run" or text[1] == "/run") then 
+    if (text[1] == "!run" or text[1] == "/run") then    --增加金钱
         if text[2] == nil then return end
         ply:money_give( tonumber(text[2]) )
         return
     end
-    if (text[1] == "!dexplevel") then
+    if (text[1] == "!dexplevel") then                   --某一职业等级, 经验置0
         if text[2] == nil then return end
         ply:DeXpandLevel(text[2])
+        return
     end
     if (text[1] == "!checkxp") then
-        if text[2] == nil then return end
+        if text[2] == nil then return end               --获得某一职业的等级和经验
         print(ply:GetNWInt("XP" .. "_" .. text[2]))
         print(ply:GetNWInt("Level" .. "_" .. text[2]))
+        return
     end
-    if (text[1] == "!set" or text[1] == "/run") then 
+    if (text[1] == "!set" or text[1] == "/set") then 
         if text[2] == nil then return end
         ply:money_take( tonumber(text[2]) )
         return
@@ -148,20 +150,20 @@ function SMSChatCommands(ply, text)
         print( math.ceil( ( 100 + math.floor( math.random() * 2.1 ) ) * ( 1.0 + ( roi / 100.0 ) ) * ( -100/100 ) ) )
         return ""
     end
-    if (text[1] == "!de" ) then
+    if (text[1] == "!de" ) then         --
         --ply:money_set( 0 )
         PrintTable(nxrp.Crime)
         print(nxrp.GetCrime(ply))
         return
     end
-    if (text[1] == "!add" ) then
-        if text[2] == nil and text[3] == nil then return end
+    if (text[1] == "!add" ) then                    --增加经验
+        if text[2] == nil or text[3] == nil then return end
         print( "Level:" .. ply:GetNWInt( "Level" .. "_" .. tostring( text[3] ) ) )
         print( "XP:" .. ply:GetNWInt( "XP" .. "_" .. tostring( text[3] ) ) )
-        ply:StatsAddXp( text[2], tostring( text[3] ) )
+        ply:StatsAddXp( tonumber(text[2]), tostring( text[3] ) )
         return ""
     end
-    if ( text[1] == "!jobxp" ) then
+    if ( text[1] == "!jobxp" ) then         --查看所有职业的经验和等级
         local tbl = {
             "citizen",
             "doctor",
@@ -176,13 +178,13 @@ function SMSChatCommands(ply, text)
     end
 end
     
-hook.Add("PlayerSay", "ChatCommands", SMSChatCommands) 
+hook.Add("PlayerSay", "ChatCommands", NXChatCommands) 
 
 function GM:Think()
     for _, v in pairs( player.GetAll() ) do
         --print( v )
         if IsValid( v ) then
-            local wallet = v:PS2_GetWallet()
+            local wallet = v:PS2_GetWallet()        --### 
            --PrintTable(wallet)
             if wallet then
                 if v:GetNWInt( "KPlayerId" ) == wallet.ownerId then
