@@ -14,7 +14,7 @@ function items.RemoveprojectTable(name)
 	items.projectTable[name] = nil
 end
 
-for k, name in pairs(file.Find("entities/jobnpc_project/items/*.lua", "GAME")) do
+for k, name in pairs(file.Find("lua/entities/jobnpc_project/items/*.lua", "GAME")) do
 	local path = "entities/jobnpc_project/items/" .. name
 	include(path)
 	AddCSLuaFile(path)
