@@ -61,42 +61,61 @@ end)
 
 
 --全局功能
+--三个table
 nxrp = {}
-nxrp.Crime = {} or nxrp.Crime
-nxrp.SmallJob = {} or nxrp.SmallJob
+nxrp.Crime = nxrp.Crime or {}   --crime hash表 键ply, 值data
+nxrp.SmallJob = nxrp.SmallJob or {}
 
+--玩家选择了一个工作
 function nxrp.Joinjob( ply, id, group_name )
 
-    ply:RemoveAllItems()
-    ULib.ucl.addUser( id, allows, denies, group_name )
+    ply:RemoveAllItems()    --移除玩家身上的武器和子弹
+    ULib.ucl.addUser( id, allows, denies, group_name )  --加入ulx group
 
 end
+
 ----------------------------------------------
+--crime相关
+
+--加入到crime hash表中
 function nxrp.SetCrime( ply, data )
     nxrp.Crime[ply] = data
 end
+
 function nxrp.GetCrime( ply )
-    for k, v in pairs(nxrp.Crime) do
-        if ply == k then
-            return true, v
-        end
+    -- for k, v in pairs(nxrp.Crime) do     --没有必要循环, 直接返回即可
+    --     if ply == k then                 --qqq 修改调用处
+    --         return true, v
+    --     end
+    -- end
+    if nxrp.Crime[ply] then                 --临时
+        return true, nxrp.Crime[ply]
     end
+    --return nxrp.Crime[ply]      --调用的时候进行判断, 如果为nil 说明没有数据
 end
-function nxrp.DeleCrime( ply, data )
+
+function nxrp.DeleCrime(ply)
     nxrp.Crime[ply] = nil
 end
-----------------------------------------------
+
+------------------------------------------------
+--smalljob 相关
+
+--添加工作
 function nxrp.Addsmalljob( smalljobname,data )
     nxrp.SmallJob[smalljobname] = data
 end
+
 function nxrp.Joinsmalljob( smalljobname, ply, steamid )
     nxrp.SmallJob[smalljobname][ply] = {} or nxrp.SmallJob[smalljobname][ply]
     table.insert( nxrp.SmallJob[smalljobname][ply], steamid )
 end
+
 function nxrp.Exitmalljob( smalljobname, ply, steamid )
     nxrp.SmallJob[smalljobname][ply] = {} or nxrp.SmallJob[smalljobname][ply]
-    nxrp.SmallJob[smalljobname][ply] = nil
+    nxrp.SmallJob[smalljobname][ply] = nil`
 end
+
 function nxrp.Getsmalljob( ply )
     for k, data in pairs( nxrp.SmallJob ) do
         for tblply, v in pairs(data) do
@@ -108,6 +127,7 @@ function nxrp.Getsmalljob( ply )
         end
     end
 end
+
 function nxrp.GetsmalljobColor( teamname )
     for k, data in pairs( nxrp.SmallJob ) do
         if k == teamname then
@@ -115,7 +135,10 @@ function nxrp.GetsmalljobColor( teamname )
         end
     end   
 end
+
 ----------------------------------------------
+
+
 function SetGenderModel( ply )
     local team = ULib.ucl.groups[ ply:GetUserGroup() ].team
     if team then
