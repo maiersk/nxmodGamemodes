@@ -101,19 +101,20 @@ end
 ------------------------------------------------
 --smalljob 相关
 
---添加工作
+--添加一项工作
 function nxrp.Addsmalljob( smalljobname,data )
     nxrp.SmallJob[smalljobname] = data
 end
 
+--设置某个玩家的工作
 function nxrp.Joinsmalljob( smalljobname, ply, steamid )
-    nxrp.SmallJob[smalljobname][ply] = {} or nxrp.SmallJob[smalljobname][ply]
-    table.insert( nxrp.SmallJob[smalljobname][ply], steamid )
+    nxrp.SmallJob[smalljobname][ply] = nxrp.SmallJob[smalljobname][ply] or {}
+    table.insert( nxrp.SmallJob[smalljobname][ply], steamid )       --改成键值的, 嵌套了太多table了
 end
 
 function nxrp.Exitmalljob( smalljobname, ply, steamid )
-    nxrp.SmallJob[smalljobname][ply] = {} or nxrp.SmallJob[smalljobname][ply]
-    nxrp.SmallJob[smalljobname][ply] = nil`
+    nxrp.SmallJob[smalljobname][ply] = nxrp.SmallJob[smalljobname][ply] or {} 
+    nxrp.SmallJob[smalljobname][ply] = nil                          --改成键值的, 嵌套了太多table了
 end
 
 function nxrp.Getsmalljob( ply )
