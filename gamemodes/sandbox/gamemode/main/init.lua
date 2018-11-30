@@ -184,12 +184,12 @@ function GM:Think()
     for _, v in pairs( player.GetAll() ) do
         --print( v )
         if IsValid( v ) then
-            local wallet = v:PS2_GetWallet()        --### 
+            local wallet = v:PS2_GetWallet()        --得到玩家PS2商店钱包
            --PrintTable(wallet)
             if wallet then
-                if v:GetNWInt( "KPlayerId" ) == wallet.ownerId then
-                    if v:GetNWInt("money") ~= wallet.points then
-                        v:money_set( tonumber(wallet.points) )
+                if v:GetNWInt( "KPlayerId" ) == wallet.ownerId then     --得到PS2商店插件写的网络玩家商店id。如果等于钱包的id就是该玩家的钱包那么继续
+                    if v:GetNWInt("money") ~= wallet.points then        --如果玩家经济系统金钱和PS2商店金钱不一样
+                        v:money_set( tonumber(wallet.points) )          --设置金币，完成同步
                     end
                 end
             end
