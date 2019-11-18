@@ -261,7 +261,6 @@ if (SERVER) then
 	
 	player_data = FindMetaTable("Player") -- Gets all the functions that affect player.
 	
-	
 	-- Money:
 	
 	function player_data:money_initLoad()
@@ -323,6 +322,38 @@ if (SERVER) then
 	-- 货币被解释为全尺寸货币。 没有便士和小狗屎.
 	function player_data:money_interact( method, amount ) -- 添加或拿钱.
 		if (GetConVar( "money_freeze" ):GetBool() == false) then
+			local wallet = self:PS2_GetWallet()
+			local money = self:GetNWInt( "money" ) -- 获得球员的钱.
+			if wallet then
+				if self:GetNWInt( "KPlayerId" ) == wallet.ownerId then
+					if (method == 0) then-- 方法0是拿钱，方法1（不是0）是给钱的.
+						if self:IsBot() then 
+						return 
+						else
+						Pointshop2Controller:getInstance():adminChangeWallet( self, wallet.ownerId, "points", wallet.points - amount )
+						end
+						self:SetNWInt("money", money - amount) 	-- 设置网络int为钱。 这样我们就可以在客户端上获取它.
+						self:SetPData("money", money - amount) 	-- 用户资金更新为当前所拥有的金额 - 来自互动的金额.
+					elseif (method == 1) then 
+						if self:IsBot() then 
+						return 
+						else
+						Pointshop2Controller:getInstance():adminChangeWallet( self, wallet.ownerId, "points", wallet.points + amount )
+						end
+						self:SetNWInt("money", money + amount)	-- 设置网络int为钱。 这样我们就可以在客户端上获取它.
+						self:SetPData("money", money + amount) 	-- 用户资金被更新为当前具有的内容+来自交互的金额.
+					elseif (method == 2) then 
+						if self:IsBot() then 
+						return 
+						else
+						Pointshop2Controller:getInstance():adminChangeWallet( self, wallet.ownerId, "points", amount )
+						end
+						self:SetNWInt("money", amount)	-- 设置网络int为钱。 这样我们就可以在客户端上获取它.
+						self:SetPData("money", amount) 	-- 用户资金被更新为当前具有的内容+来自交互的金额.
+					end
+				end
+			end
+			--[[
 			for _, v in pairs( player.GetAll() ) do
 				if IsValid( v ) then
 					local wallet = v:PS2_GetWallet()
@@ -359,6 +390,7 @@ if (SERVER) then
 					end
 				end
 			end
+			--]]
 		else
 			return
 		end
@@ -563,7 +595,7 @@ if (SERVER) then
 				end
 				--]]
 			else
-				print("no")
+				print("wage side: no")
 				paydayMoney = math.ceil((settings['payday_amount']+math.floor(randomFactor*3.1))*(1.0+(roi/100.0)))
 			end
 			

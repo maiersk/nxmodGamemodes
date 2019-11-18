@@ -5,6 +5,8 @@ AddCSLuaFile( "cl_init.lua" )
 --AddCSLuaFile( "teamconfig.lua" )
 AddCSLuaFile( "vgui/menu_main.lua" )
 AddCSLuaFile( "vgui/columnsheet.lua" )
+AddCSLuaFile( "vgui/trespawnicon.lua" )
+
 AddCSLuaFile( "playerstats.lua" )
 
 include( "playerstats.lua" )
@@ -15,7 +17,27 @@ include( "sv_hud.lua" )
 include( "sv_job.lua" )
 include( "shared.lua" )
 
+local path = GM.FolderName .. "/gamemode/main/modules/"
+local _, folders = file.Find(path .. "*", "LUA")
+print("=== ModulesLoading...")
+for k, folder in SortedPairs(folders, true) do
+    print("-> " .. folder)
+    for _, file in SortedPairs(file.Find(path .. folder .. "/sh_*.lua", "LUA"), true) do
+        AddCSLuaFile(path .. folder .. "/" .. file)
+        include(path .. folder .. "/" .. file)
+    end 
 
+    for _, file in SortedPairs(file.Find(path .. folder .. "/sv_*.lua", "LUA"), true) do
+        include(path .. folder .. "/" .. file)
+    end 
+
+    for _, file in SortedPairs(file.Find(path .. folder .. "/cl_*.lua", "LUA"), true) do
+        AddCSLuaFile(path .. folder .. "/" .. file)
+    end 
+end
+
+Faction:Load()
+Domain:Load()
 
 --注册网络字符串
 util.AddNetworkString("firstspawn")
@@ -84,6 +106,7 @@ hook.Add( "PlayerDisconnected", "PlyDied", function( ply )
 end)
 
 
+
 --F1按钮
 function ShowHelp( ply )
     net.Start( "f1help" )
@@ -96,6 +119,9 @@ function GM:ShowSpare2( ply )
     net.Send( ply )
 end
 
+function GM:PlayerSwitchFlashlight( ply, SwitchOn )
+	return true
+end
 
 --设置显示手部模型function
 function GM:PlayerSetHandsModel( ply, ent )
@@ -150,11 +176,22 @@ function NXChatCommands(ply, text)
         print( math.ceil( ( 100 + math.floor( math.random() * 2.1 ) ) * ( 1.0 + ( roi / 100.0 ) ) * ( -100/100 ) ) )
         return ""
     end
+    if (text[1] == "!test1") then 
+        local plyer = player.GetBySteamID("STEAM_0:1:428757358")
+        local wallet = plyer:PS2_GetWallet()
+        print(plyer:GetNWInt("KPlayerId"))
+        print(wallet.ownerId)
+        return ""
+    end
+    if (text[1] == "!setmoney" ) then         --
+        ply:money_set( 1000 )
+        return ""
+    end
     if (text[1] == "!de" ) then         --
         --ply:money_set( 0 )
         PrintTable(nxrp.Crime)
         print(nxrp.GetCrime(ply))
-        return
+        return ""
     end
     if (text[1] == "!add" ) then                    --增加经验
         if text[2] == nil or text[3] == nil then return end
@@ -162,6 +199,12 @@ function NXChatCommands(ply, text)
         print( "XP:" .. ply:GetNWInt( "XP" .. "_" .. tostring( text[3] ) ) )
         ply:StatsAddXp( tonumber(text[2]), tostring( text[3] ) )
         return ""
+    end
+    if (text[1] == "!addc") then
+        local citizenl = JobLevel:new("citizen", 100, 100)
+        citizenl:StatsAddXp( ply, 100 )
+        print( "Level:" .. ply:GetNWInt( "Level" .. "_" .. tostring( text[3] ) ) )
+        print( "XP:" .. ply:GetNWInt( "XP" .. "_" .. tostring( text[3] ) ) )
     end
     if ( text[1] == "!jobxp" ) then         --查看所有职业的经验和等级
         local tbl = {
@@ -184,24 +227,25 @@ function GM:Think()
     for _, v in pairs( player.GetAll() ) do
         --print( v )
         if IsValid( v ) then
-            local wallet = v:PS2_GetWallet()        --得到玩家PS2商店钱包
+            local wallet = v:PS2_GetWallet()        --### 
            --PrintTable(wallet)
             if wallet then
-                if v:GetNWInt( "KPlayerId" ) == wallet.ownerId then     --得到PS2商店插件写的网络玩家商店id。如果等于钱包的id就是该玩家的钱包那么继续
-                    if v:GetNWInt("money") ~= wallet.points then        --如果玩家经济系统金钱和PS2商店金钱不一样
-                        v:money_set( tonumber(wallet.points) )          --设置金币，完成同步
+                if v:GetNWInt( "KPlayerId" ) == wallet.ownerId then
+                    --print(wallet.points)
+                    if v:GetNWInt("money") ~= wallet.points then
+                        v:money_set( tonumber(wallet.points) )
                     end
+                else
+                    continue
                 end
             end
         end
-        break
     end
 end
 
-
-
 --生成菜单禁用
 --武器
+--[[
 function GM:PlayerGiveSWEP( ply, class, swep )
 	if ( !IsValid(ply) ) then return false end 
     if ( ply:IsAdmin() ) then 
@@ -211,6 +255,8 @@ function GM:PlayerGiveSWEP( ply, class, swep )
         return false
     end
 end
+--]]
+--[[
 --实体
 function GM:PlayerSpawnSENT( ply, class )
 	if ( !IsValid(ply) ) then return false end 
@@ -221,6 +267,7 @@ function GM:PlayerSpawnSENT( ply, class )
         return false
     end
 end
+--]]
 --NPC
 function GM:PlayerSpawnNPC( ply, npc_type, weapon )
 	if ( !IsValid(ply) ) then return false end 
@@ -246,8 +293,6 @@ timer.Create( "cmoney", 1, 0, function()
     end
 end)
 --]]
-
-
 --[[
 for k, v in pairs( player.GetAll() ) do
     local wallet = v:PS2_GetWallet()
@@ -291,3 +336,15 @@ for k, v in pairs( player.GetAll( ) ) do
     end
 end
 --]]
+--[[
+NetOperating.Receive("test",function(net)
+    local boolea = net.ReadBool()
+    print("sv:: ok")
+    print("sv:: " .. boolea)
+end)
+
+NetOperating.Receive("test1",function(net)
+    local boolea = net.ReadBool()
+    print("sv1:: ok")
+    print("sv1:: " .. boolea)
+end)--]]

@@ -9,26 +9,27 @@ net.Receive( "Buttonflow", function( len, ply )
     
     --npc按钮
     if ( str == "cagjob" ) then
-        if money == 0 then
+        if jobid == "citizen" then
             nxrp.Joinjob( ply, ply:SteamID(), jobid )
-            ply:SendLua("notification.AddLegacy( \"你已成为" .. jobid .. "职业\", NOTIFY_GENERIC, 5 ) surface.PlaySound( \"buttons/lever8.wav\" ) ")
+            --ply:SendLua("notification.AddLegacy( \"你已成为" .. jobid .. "职业\", NOTIFY_GENERIC, 5 ) surface.PlaySound( \"buttons/lever8.wav\" ) ")
         else
             if !ply:money_take( tonumber(money) ) then
-                ply:PrintMessage( HUD_PRINTTALK, ">> 对不起！你的账号余额不足" .. money .. "$.")
+                --ply:PrintMessage( HUD_PRINTTALK, ">> 对不起！你的账号余额不足" .. money .. "$.")
+                return
             else
                 nxrp.Joinjob( ply, ply:SteamID(), jobid )
-                ply:SendLua("notification.AddLegacy( \"你已成为" .. jobid .. "职业\", NOTIFY_GENERIC, 5 ) notification.AddLegacy( \"并从你的账号扣除" .. money .. "$入职费用\", NOTIFY_GENERIC, 5 ) surface.PlaySound( \"buttons/lever8.wav\" ) ")
+                --ply:SendLua("notification.AddLegacy( \"你已成为" .. jobid .. "职业\", NOTIFY_GENERIC, 5 ) notification.AddLegacy( \"并从你的账号扣除" .. money .. "$入职费用\", NOTIFY_GENERIC, 5 ) surface.PlaySound( \"buttons/lever8.wav\" ) ")
             end
         end
     elseif ( str == "rejob" ) then
         nxrp.Joinjob( ply, ply:SteamID(), "citizen" )
         if money then 
             ply:money_give( tonumber(money) )
-            ply:SendLua("notification.AddLegacy( \"你辞去了 旧的 职业\", NOTIFY_GENERIC, 5 ) notification.AddLegacy( \"返还" .. money .. "$就职费用\", NOTIFY_GENERIC, 5 ) surface.PlaySound( \"buttons/lever8.wav\" ) ")
+            --ply:SendLua("notification.AddLegacy( \"你辞去了 旧的 职业\", NOTIFY_GENERIC, 5 ) notification.AddLegacy( \"返还" .. money .. "$就职费用\", NOTIFY_GENERIC, 5 ) surface.PlaySound( \"buttons/lever8.wav\" ) ")
         end
     elseif ( str == "reuser" ) then
         nxrp.Joinjob( ply, ply:SteamID(), "user" )
-        ply:SendLua("notification.AddLegacy( \"你辞去了 公民 职业\", NOTIFY_GENERIC, 5 ) surface.PlaySound( \"buttons/lever8.wav\" ) ")
+        --ply:SendLua("notification.AddLegacy( \"你辞去了 公民 职业\", NOTIFY_GENERIC, 5 ) surface.PlaySound( \"buttons/lever8.wav\" ) ")
     end
 
     --性别选择按钮流
@@ -61,62 +62,42 @@ end)
 
 
 --全局功能
---三个table
 nxrp = {}
-nxrp.Crime = nxrp.Crime or {}   --crime hash表 键ply, 值data
-nxrp.SmallJob = nxrp.SmallJob or {}
+nxrp.Crime = {} or nxrp.Crime
+nxrp.SmallJob = {} or nxrp.SmallJob
 
---玩家选择了一个工作
 function nxrp.Joinjob( ply, id, group_name )
 
-    ply:RemoveAllItems()    --移除玩家身上的武器和子弹
-    ULib.ucl.addUser( id, allows, denies, group_name )  --加入ulx group
+    ply:RemoveAllItems()
+    ULib.ucl.addUser( id, allows, denies, group_name )
 
 end
-
 ----------------------------------------------
---crime相关
-
---加入到crime hash表中
 function nxrp.SetCrime( ply, data )
     nxrp.Crime[ply] = data
 end
-
 function nxrp.GetCrime( ply )
-    -- for k, v in pairs(nxrp.Crime) do     --没有必要循环, 直接返回即可
-    --     if ply == k then                 --qqq 修改调用处
-    --         return true, v
-    --     end
-    -- end
-    if nxrp.Crime[ply] then                 --临时
-        return true, nxrp.Crime[ply]
+    for k, v in pairs(nxrp.Crime) do
+        if ply == k then
+            return true, v
+        end
     end
-    --return nxrp.Crime[ply]      --调用的时候进行判断, 如果为nil 说明没有数据
 end
-
-function nxrp.DeleCrime(ply)
+function nxrp.DeleCrime( ply, data )
     nxrp.Crime[ply] = nil
 end
-
-------------------------------------------------
---smalljob 相关
-
---添加一项工作
+----------------------------------------------
 function nxrp.Addsmalljob( smalljobname,data )
     nxrp.SmallJob[smalljobname] = data
 end
-
---设置某个玩家的工作
 function nxrp.Joinsmalljob( smalljobname, ply, steamid )
-    nxrp.SmallJob[smalljobname][ply] = nxrp.SmallJob[smalljobname][ply] or {}
-    table.insert( nxrp.SmallJob[smalljobname][ply], steamid )       --改成键值的, 嵌套了太多table了
+    nxrp.SmallJob[smalljobname][ply] = {} or nxrp.SmallJob[smalljobname][ply]
+    table.insert( nxrp.SmallJob[smalljobname][ply], steamid )
 end
-
 function nxrp.Exitmalljob( smalljobname, ply, steamid )
-    nxrp.SmallJob[smalljobname][ply] = nxrp.SmallJob[smalljobname][ply] or {} 
-    nxrp.SmallJob[smalljobname][ply] = nil                          --改成键值的, 嵌套了太多table了
+    nxrp.SmallJob[smalljobname][ply] = {} or nxrp.SmallJob[smalljobname][ply]
+    nxrp.SmallJob[smalljobname][ply] = nil
 end
-
 function nxrp.Getsmalljob( ply )
     for k, data in pairs( nxrp.SmallJob ) do
         for tblply, v in pairs(data) do
@@ -128,7 +109,6 @@ function nxrp.Getsmalljob( ply )
         end
     end
 end
-
 function nxrp.GetsmalljobColor( teamname )
     for k, data in pairs( nxrp.SmallJob ) do
         if k == teamname then
@@ -136,10 +116,7 @@ function nxrp.GetsmalljobColor( teamname )
         end
     end   
 end
-
 ----------------------------------------------
-
-
 function SetGenderModel( ply )
     local team = ULib.ucl.groups[ ply:GetUserGroup() ].team
     if team then

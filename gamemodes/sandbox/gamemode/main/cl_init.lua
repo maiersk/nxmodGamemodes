@@ -2,6 +2,20 @@ include( "shared.lua" )
 include ( "cl_hud.lua" )
 include ( "vgui/menu_main.lua" )
 include ( "vgui/columnsheet.lua" )
+include ( "vgui/trespawnicon.lua" )
+
+local path = GM.FolderName .. "/gamemode/main/modules/"
+local _, folders = file.Find(path .. "*", "LUA")
+
+for k, folder in SortedPairs(folders, true) do
+    for _, file in SortedPairs(file.Find(path .. folder .. "/sh_*.lua", "LUA"), true) do
+        include(path .. folder .. "/" .. file)
+    end 
+
+    for _, file in SortedPairs(file.Find(path .. folder .. "/cl_*.lua", "LUA"), true) do
+        include(path .. folder .. "/" .. file)
+    end 
+end
 
 concommand.Add("f1menu", function() 
     f1Menu = vgui.Create('menu_f1main') f1Menu:SetVisible(true) 
@@ -38,7 +52,7 @@ net.Receive( "firstspawn", function()
             f1MainMenu:SetVisible( true )
             gui.EnableScreenClicker( true )
         end
-        --[[
+        
         --如果f1不存在，创建窗口设置不可见
         if( !f1MainMenu ) then
             f1MainMenu = vgui.Create( "menu_f1main" )
@@ -56,7 +70,7 @@ net.Receive( "firstspawn", function()
             --f4MainMenu:SetVisible( true )
             gui.EnableScreenClicker( true )
         end 
-        --]]
+        
     end 
 
 end)

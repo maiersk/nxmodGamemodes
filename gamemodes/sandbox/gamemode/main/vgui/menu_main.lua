@@ -169,7 +169,7 @@ local f1PANEL = {
         self:SetSize( 960, 670 )
         self:Center()
         self:SetVisible( true )
-        --self:MakePopup()
+        self:MakePopup()
         local x, y = self:GetSize()
         --画按钮
         local button = vgui.Create( "DButton", self )
@@ -297,7 +297,7 @@ local f1PANEL = {
         --html页
         local html = vgui.Create( "HTML", sheet3 )
         html:Dock( FILL )
-        html:OpenURL( "http://nxmod.5a1.xyz/doku.php")
+        html:OpenURL( "http://nxmod.live:8081/wiki/doku.php")
     end,
 
     Paint = function( self, w, h )
@@ -317,11 +317,10 @@ vgui.Register( "menu_f1main", f1PANEL )
 local f4PANEL = {
     Init = function( self )
 
-        --self:MakePopup()
         self:SetSize( 960, 670 )
         self:Center()
         self:SetVisible( true )
-
+        self:MakePopup()
         local x, y = self:GetSize()
 
         local button = vgui.Create( "DButton", self )
@@ -591,6 +590,7 @@ function PANEL:jobdata( jobname, femalemodel, malemodel, info, mcost, lcost )
     --就职按钮点击事件
     self.jobbutton.DoClick = function()
         if LocalPlayer():GetUserGroup() == "citizen" then
+            if LocalPlayer():GetNWInt("money") < tonumber(mcost) then return LocalPlayer():PrintMessage( HUD_PRINTTALK, ">> 对不起！你的账号余额不足" .. mcost .. "$.") end
             net.Start( "Buttonflow" )
                 net.WriteString( "cagjob" )
                 net.WriteString( jobname )
