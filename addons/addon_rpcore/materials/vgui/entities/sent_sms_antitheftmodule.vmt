@@ -1,0 +1,6 @@
+"UnlitGeneric" 
+{ 
+	"$basetexture"		"vgui/entities/sent_sms_antitheftmodule" 
+	"$vertexcolor" 		1 
+	"$vertexalpha" 		1 
+} 

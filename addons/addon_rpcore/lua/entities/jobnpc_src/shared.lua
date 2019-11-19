@@ -1,0 +1,10 @@
+ENT.Type                    =   "ai"
+ENT.Base                    =   "base_ai"
+ENT.PrintName               =   "jobnpc_createmenu"
+ENT.Category				= "nxrp" 		--类别名称
+ENT.Author 					= "N/A"			--作者
+ENT.Contact					= ""
+ENT.Instructions			= "职业npc生成菜单"		--介绍
+ENT.Spawnable				= true			--可以生成
+ENT.AdminSpawnable			= true			--管理员生成
+ENT.AutomaticFrameAdvance	= true			--是否设置自动框架推进
